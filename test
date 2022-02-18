@@ -1,1 +1,1 @@
-for((;;)); do ab -c 1 -n 60 -H"token: $(echo $RANDOM | md5sum | head -c 20; echo;)" http://127.0.0.1:3128/; sleep 0.1; done
+for((;;)); do ab -c 1 -n 60 -H"authorization: $(echo $RANDOM | md5sum | head -c 20; echo;)" http://127.0.0.1:3128/; sleep 0.1; done

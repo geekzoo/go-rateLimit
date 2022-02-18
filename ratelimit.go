@@ -21,7 +21,7 @@ func RateLimit(Token string, rate, rtimer int) bool {
 		go func() {
 			fmt.Println("Running")
 			for {
-				time.Sleep(5 * time.Second)
+				time.Sleep(time.Duration(rtimer) * time.Second)
 				start := time.Now()
 				var currentBlockCount int
 				for mlist, cont := range m.Items() {
