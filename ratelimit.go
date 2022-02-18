@@ -14,7 +14,7 @@ var (
 )
 
 // RateLimit: Limits Token to rate, returns true/false
-func RateLimit(Token string, rate int) bool {
+func RateLimit(Token string, rate, rtimer int) bool {
 	count := 1
 	if imRunning == 0 {
 		imRunning = 1

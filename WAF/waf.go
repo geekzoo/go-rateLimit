@@ -7,6 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 
 	goratelimit "github.com/geekzoo/go-rateLimit"
 )
@@ -19,9 +20,10 @@ var (
 		req.URL.Scheme = "http"
 		req.URL.Host = origin.Host
 	}
-	origin, _ = url.Parse("http://192.168.49.2/")
+	origin, _ = url.Parse("http://127.0.0.1:8000/")
 	listen    = "0.0.0.0:3128"
 	rate      = 50
+	rtimer    = 5
 )
 
 func main() {
@@ -36,10 +38,16 @@ func main() {
 	} else {
 		origin, _ = url.Parse(os.Getenv("ORIGIN"))
 	}
-	os.Getenv("ORIGIN")
-	os.Getenv("LISTEN")
-	os.Getenv("RATE")
-	os.Getenv("RATE_TIMER")
+	if len(os.Getenv("RATE")) == 0 {
+		log.Println("RATE empty using: ", rate)
+	} else {
+		rate, _ = strconv.Atoi(os.Getenv("RATE"))
+	}
+	if len(os.Getenv("RATE_TIMER")) == 0 {
+		log.Println("RATE_TIMER empty using: ", rtimer)
+	} else {
+		rtimer, _ = strconv.Atoi(os.Getenv("RATE_TIMER"))
+	}
 
 	http.HandleFunc("/", extern)
 	http.HandleFunc("/status", externPath)
@@ -52,7 +60,7 @@ func extern(w http.ResponseWriter, r *http.Request) {
 	if len(token) == 0 {
 		proxy.ServeHTTP(w, r)
 	} else {
-		allowed := goratelimit.RateLimit(token, rate)
+		allowed := goratelimit.RateLimit(token, rate, rtimer)
 		if !allowed {
 			w.Header().Add("X-Rate-Limit", fmt.Sprintf("%v", rate))
 			w.WriteHeader(429)
@@ -72,7 +80,7 @@ func externPath(w http.ResponseWriter, r *http.Request) {
 	if len(token) == 0 {
 		proxy.ServeHTTP(w, r)
 	} else {
-		allowed := goratelimit.RateLimit(token, rate)
+		allowed := goratelimit.RateLimit(token, rate, rtimer)
 		if !allowed {
 			w.Header().Add("X-Rate-Limit", fmt.Sprintf("%v", rate))
 			w.WriteHeader(429)
