@@ -26,12 +26,12 @@ var (
 
 func main() {
 
-	if len(os.Getenv("LISTEN")) >= 0 {
+	if len(os.Getenv("LISTEN")) == 0 {
 		log.Println("LISTEN empty using: ", listen)
 	} else {
 		listen = os.Getenv("LISTEN")
 	}
-	if len(os.Getenv("ORIGIN")) >= 0 {
+	if len(os.Getenv("ORIGIN")) == 0 {
 		log.Println("ORIGIN empty using: ", origin)
 	} else {
 		origin, _ = url.Parse(os.Getenv("ORIGIN"))
