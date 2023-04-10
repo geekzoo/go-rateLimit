@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
@@ -23,7 +25,7 @@ var (
 	origin, _ = url.Parse("http://127.0.0.1:8000/")
 	listen    = "0.0.0.0:3128"
 	rate      = 50
-	rtimer    = 5
+	rtimer    = 10
 )
 
 func main() {
@@ -56,7 +58,9 @@ func main() {
 
 func extern(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Via", "v8-rate")
-	token := r.Header.Get("authorization")
+	token := r.Header.Get("authorization") + r.RequestURI //+ r.UserAgent() //these are examples only a null header will limit the path
+	hash := md5.Sum([]byte(token))
+	token = hex.EncodeToString(hash[:])
 	if len(token) == 0 {
 		proxy.ServeHTTP(w, r)
 	} else {
